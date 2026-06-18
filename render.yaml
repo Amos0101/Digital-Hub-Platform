@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: digital-hub
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn digital_hub.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12
