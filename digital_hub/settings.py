@@ -4,9 +4,9 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-digital-hub-phase-one-key-change-in-production'
+SECRET_KEY = '!_-337hg9*(ndphs%h)lz6617-853rv7gy*k$q2cs20#_7f3#a'
 
-DEBUG = False
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     ".onrender.com",
