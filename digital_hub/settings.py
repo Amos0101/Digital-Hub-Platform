@@ -57,10 +57,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'digital_hub.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("postgresql://digital_hub_platform_user:lZPqhN1y7qpqvebxpMruXO4jRT0sCfOy@dpg-d8pqrra8qa3s73c47seg-a/digital_hub_platform")
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
