@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% if settings %}{{ settings.hub_name }}{% else %}Digital Hub{% endif %} — Launch Platform</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root {
+      --primary:   #0F4C81;
+      --primary-dark: #0a3460;
+      --secondary: #00B4D8;
+      --accent:    #FF7A00;
+      --accent-hover: #e06a00;
+      --bg:        #F8F9FA;
+      --text:      #212529;
+      --text-muted:#6c757d;
+      --card:      #ffffff;
+      --border:    #e9ecef;
+      --radius:    12px;
+      --radius-sm: 6px;
+      --shadow:    0 4px 24px rgba(15,76,129,.10);
+      --shadow-hover: 0 8px 40px rgba(15,76,129,.18);
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body:    'Inter', sans-serif;
+      --nav-h:        72px;
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: var(--nav-h);
+      background: var(--primary);
+      display: flex; align-items: center;
+      padding: 0 5%;
+      box-shadow: 0 2px 20px rgba(0,0,0,.25);
+      transition: background .3s;
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #fff;
+      letter-spacing: -.3px;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .nav-brand span.dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .nav-links {
+      display: flex; gap: 2rem;
+      list-style: none;
+      margin-left: auto;
+      align-items: center;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,.82);
+      font-size: .875rem;
+      font-weight: 500;
+      letter-spacing: .3px;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--secondary); }
+    .nav-links .btn-nav {
+      background: var(--accent);
+      color: #fff;
+      padding: .45rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      transition: background .2s, transform .2s;
+    }
+    .nav-links .btn-nav:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    /* Hamburger */
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; margin-left: auto;
+    }
+    .nav-toggle span {
+      display: block; width: 24px; height: 2px;
+      background: #fff; border-radius: 2px;
+      transition: all .3s;
+    }
+    .mobile-menu {
+      display: none; position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: var(--primary-dark); z-index: 999;
+      padding: 1.5rem 5%;
+      flex-direction: column; gap: 1rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: rgba(255,255,255,.9); font-size: .95rem; font-weight: 500;
+      padding: .5rem 0; border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #1a6ab1 100%);
+      display: flex; align-items: center;
+      padding: calc(var(--nav-h) + 4rem) 5% 4rem;
+      position: relative; overflow: hidden;
+    }
+
+    /* Decorative grid overlay */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,180,216,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,180,216,.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    /* Glowing orbs */
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,180,216,.15) 0%, transparent 70%);
+      right: -100px; top: -100px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 680px;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,.1);
+      color: var(--secondary);
+      font-size: .8rem; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: .35rem .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,180,216,.3);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow i { font-size: .7rem; }
+    h1.hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 1.25rem;
+    }
+    h1.hero-title em {
+      font-style: normal;
+      color: var(--secondary);
+    }
+    .hero-desc {
+      color: rgba(255,255,255,.72);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    .hero-ctas {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .8rem 2rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-weight: 600; font-size: .95rem;
+      cursor: pointer; border: none;
+      transition: all .25s; letter-spacing: .2px;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,122,0,.4); }
+    .btn-outline {
+      background: transparent; color: #fff;
+      border: 2px solid rgba(255,255,255,.4);
+    }
+    .btn-outline:hover { border-color: var(--secondary); color: var(--secondary); }
+
+    /* Countdown */
+    .countdown-container {
+      margin-top: 3rem;
+    }
+    .countdown-label {
+      color: rgba(255,255,255,.5);
+      font-size: .75rem; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+    .countdown {
+      display: flex; gap: 1rem;
+    }
+    .countdown-item {
+      text-align: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-sm);
+      padding: .75rem 1.2rem;
+      min-width: 70px;
+      backdrop-filter: blur(10px);
+    }
+    .countdown-item .num {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 700;
+      color: #fff; line-height: 1;
+      display: block;
+    }
+    .countdown-item .unit {
+      font-size: .65rem; font-weight: 600;
+      color: var(--secondary);
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-top: .25rem; display: block;
+    }
+
+    /* Hero right visual */
+    .hero-visual {
+      position: absolute; right: 5%; top: 50%;
+      transform: translateY(-50%);
+      width: min(420px, 40vw);
+      opacity: .85;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-card-stack {
+      position: relative;
+    }
+    .hero-stat-card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      backdrop-filter: blur(16px);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .hero-stat-card .icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .hero-stat-card .icon.cyan  { background: rgba(0,180,216,.2); color: var(--secondary); }
+    .hero-stat-card .icon.orange { background: rgba(255,122,0,.2); color: var(--accent); }
+    .hero-stat-card .icon.white { background: rgba(255,255,255,.15); color: #fff; }
+    .hero-stat-card .label { font-size: .78rem; color: rgba(255,255,255,.55); }
+    .hero-stat-card .value { font-family: var(--font-display); font-size: 1.1rem; color: #fff; font-weight: 600; }
+
+    /* ============================================================
+       SECTIONS SHARED
+    ============================================================ */
+    section { padding: 5rem 5%; }
+    .section-eyebrow {
+      font-size: .72rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--secondary);
+      margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      font-weight: 700; color: var(--primary);
+      line-height: 1.15; letter-spacing: -.5px;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--text-muted); font-size: 1rem;
+      max-width: 560px; line-height: 1.7;
+    }
+    .section-header { margin-bottom: 3rem; }
+    .section-header.center { text-align: center; }
+    .section-header.center .section-sub { margin: 0 auto; }
+
+    /* ============================================================
+       ABOUT SECTION
+    ============================================================ */
+    #about { background: #fff; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem 4rem;
+      align-items: start;
+    }
+    .about-intro { grid-column: 1 / -1; }
+    .about-card {
+      border-left: 3px solid var(--secondary);
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .about-card h3 {
+      font-family: var(--font-display);
+      font-weight: 600; font-size: 1rem;
+      color: var(--primary); margin-bottom: .5rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .about-card h3 i { color: var(--secondary); font-size: .9rem; }
+    .about-card p { color: var(--text-muted); font-size: .9rem; line-height: 1.65; }
+
+    /* Impact stats */
+    .impact-bar {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius);
+      padding: 2.5rem 3rem;
+      display: flex; gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+    }
+    .impact-stat { flex: 1; min-width: 120px; text-align: center; }
+    .impact-stat .num {
+      font-family: var(--font-display);
+      font-size: 2.2rem; font-weight: 700; color: #fff; display: block;
+    }
+    .impact-stat .desc { font-size: .8rem; color: rgba(255,255,255,.7); margin-top: .25rem; }
+
+    /* ============================================================
+       EVENTS SECTION
+    ============================================================ */
+    #events { background: var(--bg); }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .event-poster-thumb {
+  height: 160px;
+  overflow: hidden;
+}
+.event-poster-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+.event-card:hover .event-poster-thumb img {
+  transform: scale(1.04);
+}
+.event-card-body {
+  padding: 1rem 1.25rem;
+}
+.event-card-footer {
+  padding: 0 1.25rem 1.25rem;
+}
+    .event-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .25s, box-shadow .25s;
+      display: flex; flex-direction: column;
+    }
+    .event-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .event-card-header {
+      padding: 1.75rem 1.75rem 1.25rem;
+      position: relative;
+    }
+    .event-card-header.townhall { background: linear-gradient(135deg, #0F4C81 0%, #1a6ab1 100%); }
+    .event-card-header.launch   { background: linear-gradient(135deg, #00B4D8 0%, #0096b7 100%); }
+    .event-card-header.hackathon{ background: linear-gradient(135deg, #FF7A00 0%, #e06a00 100%); }
+    .event-tag {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(255,255,255,.2);
+      color: #fff; font-size: .7rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: .3rem .75rem; border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .event-card-header h3 {
+      font-family: var(--font-display); font-size: 1.3rem;
+      color: #fff; font-weight: 700;
+    }
+    .event-card-body { padding: 1.5rem 1.75rem; flex: 1; }
+    .event-meta {
+      display: flex; flex-direction: column; gap: .5rem;
+      margin-bottom: 1.25rem;
+    }
+    .event-meta-item {
+      display: flex; align-items: center; gap: .65rem;
+      font-size: .87rem; color: var(--text-muted);
+    }
+    .event-meta-item i { color: var(--secondary); width: 14px; text-align: center; }
+    .event-meta-item strong { color: var(--text); }
+    .event-card-footer { padding: 0 1.75rem 1.75rem; }
+
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: var(--primary-dark);
+      color: rgba(255,255,255,.75);
+    }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding: 4rem 5% 3rem;
+    }
+    .footer-brand .name {
+      font-family: var(--font-display);
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      margin-bottom: .75rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .footer-brand p { font-size: .85rem; line-height: 1.7; max-width: 260px; }
+    .footer-social {
+      display: flex; gap: .6rem; margin-top: 1.25rem;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; color: rgba(255,255,255,.7);
+      transition: background .2s, color .2s;
+    }
+    .footer-social a:hover { background: var(--secondary); color: #fff; }
+    .footer-col h4 {
+      font-family: var(--font-display); font-size: .8rem;
+      font-weight: 700; color: #fff; letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .footer-col ul a { font-size: .85rem; transition: color .2s; }
+    .footer-col ul a:hover { color: var(--secondary); }
+    .footer-col .contact-item {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .85rem; margin-bottom: .6rem;
+    }
+    .footer-col .contact-item i { color: var(--secondary); margin-top: 3px; font-size: .8rem; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 1.5rem 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { font-size: .8rem; }
+    .footer-bottom .admin-link {
+      font-size: .78rem; color: rgba(255,255,255,.4);
+      transition: color .2s;
+    }
+    .footer-bottom .admin-link:hover { color: var(--secondary); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 992px) {
+      .hero-visual { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .footer-main { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .hero { padding-top: calc(var(--nav-h) + 2rem); }
+      .countdown { gap: .5rem; }
+      .countdown-item { min-width: 58px; padding: .6rem .8rem; }
+      .impact-bar { padding: 2rem 1.5rem; gap: 1.5rem; }
+      .footer-main { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      section { padding: 3.5rem 5%; }
+      .hero-ctas { flex-direction: column; }
+      .btn { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== NAVIGATION ===================== -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <span class="dot"></span>
+    {% if settings %}{{ settings.hub_name }}{% else %}Digital Hub{% endif %}
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#posters">Posters</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#events" class="btn-nav"><i class="fa-solid fa-bolt"></i> Register Now</a></li>
+    <li><a href="#speakers">Speakers</a></li>
+<li><a href="#sponsors">Sponsors</a></li>
+  </ul>
+
+  <button class="nav-toggle" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#events" onclick="toggleMenu()">Events</a>
+  <a href="#posters" onclick="toggleMenu()">Posters</a>
+  <a href="#contact" onclick="toggleMenu()">Contact</a>
+  <a href="#events" onclick="toggleMenu()" style="color:var(--accent);font-weight:700;">Register Now →</a>
+  <li><a href="#speakers">Speakers</a></li>
+<li><a href="#sponsors">Sponsors</a></li>
+</div>
+
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <i class="fa-solid fa-circle-dot"></i>
+      Coming Soon — Mark Your Calendar
+    </div>
+
+    <h1 class="hero-title">
+      Welcome to<br>
+      <em>{% if settings %}{{ settings.hub_name }}{% else %}Digital Hub{% endif %}</em>
+    </h1>
+
+    <p class="hero-desc">
+      {% if settings and settings.tagline %}
+        {{ settings.tagline }}
+      {% else %}
+        A space where innovators, entrepreneurs, and technologists converge to build the future. Join us for the official launch.
+      {% endif %}
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#events" class="btn btn-primary">
+        <i class="fa-solid fa-rocket"></i> Register for an Event
+      </a>
+      <a href="#about" class="btn btn-outline">
+        Learn More <i class="fa-solid fa-arrow-down"></i>
+      </a>
+    </div>
+
+    {% if launch_date_iso %}
+    <div class="countdown-container">
+      <div class="countdown-label">Countdown to Launch Day</div>
+      <div class="countdown" id="countdown">
+        <div class="countdown-item"><span class="num" id="cd-days">--</span><span class="unit">Days</span></div>
+        <div class="countdown-item"><span class="num" id="cd-hours">--</span><span class="unit">Hours</span></div>
+        <div class="countdown-item"><span class="num" id="cd-mins">--</span><span class="unit">Mins</span></div>
+        <div class="countdown-item"><span class="num" id="cd-secs">--</span><span class="unit">Secs</span></div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Decorative stat cards (right side, hidden on mobile) -->
+  <div class="hero-visual">
+    <div class="hero-card-stack">
+      <div class="hero-stat-card">
+        <div class="icon cyan"><i class="fa-solid fa-users"></i></div>
+        <div>
+          <div class="label">Expected Attendees</div>
+          <div class="value">500+ Innovators</div>
+        </div>
+      </div>
+      <div class="hero-stat-card">
+        <div class="icon orange"><i class="fa-solid fa-trophy"></i></div>
+        <div>
+          <div class="label">Hackathon Prizes</div>
+          <div class="value">Exciting Rewards</div>
+        </div>
+      </div>
+      <div class="hero-stat-card">
+        <div class="icon white"><i class="fa-solid fa-calendar-check"></i></div>
+        <div>
+          <div class="label">Events</div>
+          <div class="value">3 Major Activities</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===================== ABOUT ===================== -->
+<section id="about">
+  <div class="section-header">
+    <div class="section-eyebrow">Who We Are</div>
+    <h2 class="section-title">About the Digital Hub</h2>
+    <p class="section-sub">
+      {% if settings and settings.about_mission %}
+        {{ settings.about_mission|truncatewords:40 }}
+      {% else %}
+        A centre of excellence designed to nurture talent, accelerate innovation, and drive digital transformation across communities and industries.
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-card">
+      <h3><i class="fa-solid fa-bullseye"></i> Our Mission</h3>
+      <p>{% if settings and settings.about_mission %}{{ settings.about_mission }}{% else %}To empower individuals and organizations by providing world-class digital infrastructure, mentorship, and collaborative opportunities that drive sustainable innovation and growth.{% endif %}</p>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-eye"></i> Our Vision</h3>
+      <p>{% if settings and settings.about_vision %}{{ settings.about_vision }}{% else %}To become the leading technology and innovation hub that catalyses economic transformation and positions the region as a global digital powerhouse.{% endif %}</p>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-list-check"></i> Objectives</h3>
+      <p>{% if settings and settings.about_objectives %}{{ settings.about_objectives }}{% else %}Foster entrepreneurship, provide access to emerging technologies, support startups, and create pathways to digital careers for youth and professionals alike.{% endif %}</p>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-chart-line"></i> Expected Impact</h3>
+      <p>{% if settings and settings.about_impact %}{{ settings.about_impact }}{% else %}Generate employment, accelerate startup growth, build digital skills across thousands of individuals, and attract investment into the local technology ecosystem.{% endif %}</p>
+    </div>
+  </div>
+
+  <div class="impact-bar">
+    <div class="impact-stat">
+      <span class="num">500+</span>
+      <span class="desc">Expected Participants</span>
+    </div>
+    <div class="impact-stat">
+      <span class="num">3</span>
+      <span class="desc">Major Events</span>
+    </div>
+    <div class="impact-stat">
+      <span class="num">10+</span>
+      <span class="desc">Expert Speakers</span>
+    </div>
+    <div class="impact-stat">
+      <span class="num">∞</span>
+      <span class="desc">Opportunities Ahead</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===================== EVENTS ===================== -->
+<section id="events">
+  <div class="section-header center">
+    <div class="section-eyebrow">What's On</div>
+    <h2 class="section-title">Upcoming Events</h2>
+    <p class="section-sub">Register below to secure your place at any of our upcoming events.</p>
+  </div>
+
+  {% if events %}
+  <div class="events-grid">
+    {% for event in events %}
+    <div class="event-card">
+      <div class="event-card-header
+        {% if event.event_type == 'townhall' %}townhall
+        {% elif event.event_type == 'launch' %}launch
+        {% elif event.event_type == 'hackathon' %}hackathon
+        {% else %}launch{% endif %}">
+
+        <div class="event-tag">
+          <i class="fa-solid
+            {% if event.event_type == 'townhall' %}fa-microphone
+            {% elif event.event_type == 'hackathon' %}fa-code
+            {% else %}fa-star{% endif %}">
+          </i>
+          {{ event.get_event_type_display }}
+        </div>
+        <h3>{{ event.title }}</h3>
+      </div>
+
+      {% if event.poster %}
+      <div class="event-poster-thumb">
+        <img src="{{ event.poster.url }}" alt="{{ event.title }} poster" />
+      </div>
+      {% endif %}
+
+      <div class="event-card-body">
+        <div class="event-meta">
+          <div class="event-meta-item">
+            <i class="fa-regular fa-calendar"></i>
+            <strong>{{ event.date|date:"l, F j, Y" }}</strong>
+          </div>
+          <div class="event-meta-item">
+            <i class="fa-regular fa-clock"></i>
+            <strong>{{ event.time|time:"g:i A" }}</strong>
+          </div>
+          <div class="event-meta-item">
+            <i class="fa-solid fa-location-dot"></i> {{ event.venue }}
+          </div>
+          {% if event.theme %}
+          <div class="event-meta-item">
+            <i class="fa-solid fa-lightbulb"></i> Theme: <strong>{{ event.theme }}</strong>
+          </div>
+          {% endif %}
+          {% if event.prize_info %}
+          <div class="event-meta-item">
+            <i class="fa-solid fa-trophy"></i> {{ event.prize_info }}
+          </div>
+          {% endif %}
+        </div>
+
+        {% if event.description %}
+        <p style="font-size:.87rem;color:var(--text-muted);line-height:1.65;">
+          {{ event.description|truncatewords:30 }}
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="event-card-footer">
+        <a href="{% url 'event_detail' event.pk %}" class="btn btn-primary" style="width:100%;justify-content:center;">
+          <i class="fa-solid fa-user-plus"></i> Register &amp; View Details
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="text-align:center;padding:4rem 0;color:var(--text-muted);">
+    <i class="fa-regular fa-calendar-xmark" style="font-size:3rem;margin-bottom:1rem;display:block;color:var(--border);"></i>
+    <p>No events have been published yet. Check back soon.</p>
+  </div>
+  {% endif %}
+</section>
+
+
+<!--&lt;!&ndash; ===================== POSTERS ===================== &ndash;&gt;-->
+{% if events %}
+<section id="posters" style="background:#fff;">
+  <div class="section-header center">
+    <div class="section-eyebrow">Event Collateral</div>
+    <h2 class="section-title">Event Posters</h2>
+    <p class="section-sub">Official posters for each event. Download and share to spread the word.</p>
+  </div>
+
+  <div class="posters-grid">
+    {% for event in events %}
+      {% if event.poster %}
+      <div class="poster-card">
+        <div class="poster-img-wrap">
+          <img src="{{ event.poster.url }}" alt="{{ event.title }} poster" />
+        </div>
+        <div class="poster-label">
+          <i class="fa-solid {% if event.event_type == 'townhall' %}fa-microphone{% elif event.event_type == 'hackathon' %}fa-code{% else %}fa-star{% endif %}"></i>
+          {{ event.title }}
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ===================== SPEAKERS ===================== -->
+{% if speakers %}
+<section id="speakers" style="background:var(--bg);">
+  <div class="section-header center">
+    <div class="section-eyebrow">Meet the Experts</div>
+    <h2 class="section-title">Speakers & Mentors</h2>
+    <p class="section-sub">Industry leaders and mentors joining us across our events.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+    {% for sp in speakers %}
+    <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.75rem;text-align:center;">
+      {% if sp.photo %}
+      <img src="{{ sp.photo.url }}" alt="{{ sp.name }}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block;border:3px solid var(--secondary);"/>
+      {% else %}
+      <div style="width:84px;height:84px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--text-muted);font-size:1.8rem;">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      {% endif %}
+      <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.25rem;">{{ sp.name }}</h3>
+      {% if sp.position %}<p style="font-size:.8rem;color:var(--secondary);font-weight:600;margin-bottom:.6rem;">{{ sp.position }}</p>{% endif %}
+      {% if sp.biography %}<p style="font-size:.82rem;color:var(--text-muted);line-height:1.6;">{{ sp.biography|truncatewords:20 }}</p>{% endif %}
+      <span style="display:inline-block;margin-top:.75rem;font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--accent);">{{ sp.event.get_event_type_display }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ===================== PROGRAM SCHEDULE ===================== -->
+{% if schedule %}
+<section id="schedule" style="background:#fff;">
+  <div class="section-header center">
+    <div class="section-eyebrow">Plan Your Day</div>
+    <h2 class="section-title">Event Program</h2>
+    <p class="section-sub">A full breakdown of activities across our events.</p>
+  </div>
+
+  {% regroup schedule by event as schedule_by_event %}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;">
+    {% for group in schedule_by_event %}
+    <div>
+      <h3 style="font-family:var(--font-display);font-size:1.05rem;color:var(--primary);font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+        <i class="fa-solid fa-calendar-day" style="color:var(--secondary);"></i> {{ group.grouper.title }}
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        {% for item in group.list %}
+        <div style="display:flex;gap:1rem;padding:.85rem 0;border-bottom:1px solid var(--border);">
+          <div style="min-width:80px;font-family:var(--font-display);font-weight:700;color:var(--accent);font-size:.85rem;">
+            {{ item.time|time:"g:i A" }}
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:.9rem;color:var(--text);">{{ item.activity }}</div>
+            {% if item.description %}<div style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem;">{{ item.description }}</div>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ===================== SPONSORS ===================== -->
+{% if sponsors %}
+<section id="sponsors" style="background:var(--bg);">
+  <div class="section-header center">
+    <div class="section-eyebrow">Supported By</div>
+    <h2 class="section-title">Sponsors & Partners</h2>
+    <p class="section-sub">Organizations powering the Digital Hub launch.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1.5rem;align-items:center;">
+    {% for sponsor in sponsors %}
+    <a href="{{ sponsor.website_url|default:'#' }}" target="{% if sponsor.website_url %}_blank{% else %}_self{% endif %}"
+       style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:.75rem;transition:transform .2s;">
+      {% if sponsor.logo %}
+      <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" style="height:50px;max-width:100%;object-fit:contain;"/>
+      {% else %}
+      <div style="height:50px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:1.5rem;"><i class="fa-solid fa-building"></i></div>
+      {% endif %}
+      <span style="font-size:.8rem;font-weight:600;color:var(--text);text-align:center;">{{ sponsor.name }}</span>
+      <span style="font-size:.65rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--secondary);">{{ sponsor.get_tier_display }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ===================== FOOTER ===================== -->
+<footer id="contact">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <div class="name">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+        {% if settings %}{{ settings.hub_name }}{% else %}Digital Hub{% endif %}
+      </div>
+      <p>
+        A centre of innovation, collaboration, and digital transformation. Empowering the next generation of tech leaders.
+      </p>
+      <div class="footer-social">
+        {% if settings and settings.twitter_url %}<a href="{{ settings.twitter_url }}" target="_blank" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>{% else %}<a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>{% endif %}
+        {% if settings and settings.facebook_url %}<a href="{{ settings.facebook_url }}" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>{% else %}<a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+        {% if settings and settings.instagram_url %}<a href="{{ settings.instagram_url }}" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>{% else %}<a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+        {% if settings and settings.linkedin_url %}<a href="{{ settings.linkedin_url }}" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>{% else %}<a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>{% endif %}
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#posters">Posters</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Events</h4>
+      <ul>
+        <li><a href="#events">Town Hall Meeting</a></li>
+        <li><a href="#events">Official Launch</a></li>
+        <li><a href="#events">Hackathon</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      {% if settings %}
+        {% if settings.contact_email %}
+        <div class="contact-item"><i class="fa-solid fa-envelope"></i> {{ settings.contact_email }}</div>
+        {% endif %}
+        {% if settings.contact_phone %}
+        <div class="contact-item"><i class="fa-solid fa-phone"></i> {{ settings.contact_phone }}</div>
+        {% endif %}
+        {% if settings.contact_address %}
+        <div class="contact-item"><i class="fa-solid fa-location-dot"></i> {{ settings.contact_address }}</div>
+        {% endif %}
+      {% else %}
+        <div class="contact-item"><i class="fa-solid fa-envelope"></i> info@digitalhub.co.ke</div>
+        <div class="contact-item"><i class="fa-solid fa-phone"></i> +254 700 000 000</div>
+        <div class="contact-item"><i class="fa-solid fa-location-dot"></i> Nairobi, Kenya</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; {% now "Y" %} {% if settings %}{{ settings.hub_name }}{% else %}Digital Hub{% endif %}. All rights reserved.</p>
+    <a href="/dashboard/login/" class="admin-link"><i class="fa-solid fa-lock"></i> Admin Portal</a>
+  </div>
+</footer>
+
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+  // Countdown timer
+  {% if launch_date_iso %}
+  const launchDate = new Date("{{ launch_date_iso }}");
+  function updateCountdown() {
+    const now = new Date();
+    const diff = launchDate - now;
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '0';
+      document.getElementById('cd-hours').textContent = '0';
+      document.getElementById('cd-mins').textContent = '0';
+      document.getElementById('cd-secs').textContent = '0';
+      return;
+    }
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000)  / 60000);
+    const secs  = Math.floor((diff % 60000)    / 1000);
+    document.getElementById('cd-days').textContent  = String(days).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+    document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
+    document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+  {% endif %}
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // Close mobile menu on scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('mobileMenu').classList.remove('open');
+  });
+
+  // Smooth scroll for hash links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

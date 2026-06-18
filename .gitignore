@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.venv1/
+venv/
+
+# PyCharm
+.idea/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Environment files
+.env
+.env1
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# OS files
+.DS_Store

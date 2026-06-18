@@ -1,0 +1,54 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Program Schedule{% endblock %}
+{% block topbar_title %}Program Schedule{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Program Schedule</h1><p>Manage the day's schedule per event.</p></div>
+  <div style="display:flex;gap:.75rem;">
+  <a href="{% url 'dashboard_schedule_bulk' %}" class="btn btn-primary"><i class="fa-solid fa-layer-group"></i> Bulk Add Schedule</a>
+  <a href="{% url 'dashboard_schedule_create' %}" class="btn btn-outline"><i class="fa-solid fa-plus"></i> Add Single Item</a>
+</div>
+</div>
+
+<div class="card">
+  {% if items %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Activity</th><th>Description</th><th>Event</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td><strong>{{ item.time|time:"g:i A" }}</strong></td>
+          <td>{{ item.activity }}</td>
+          <td style="color:var(--muted);">{{ item.description|default:"—" }}</td>
+          <td><span class="badge badge-blue">{{ item.event.title }}</span></td>
+          <td>
+            <div style="display:flex;gap:.5rem;">
+              <a href="{% url 'dashboard_schedule_edit' item.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fa-solid fa-pen"></i></a>
+              <button onclick="openDeleteModal({{ item.pk }})" class="btn btn-danger btn-sm btn-icon"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+        <div class="modal-overlay" id="modal-{{ item.pk }}">
+          <div class="modal">
+            <h3>Remove this schedule item?</h3>
+            <p>"{{ item.activity }}" will be removed from the program.</p>
+            <div class="modal-actions">
+              <button onclick="closeDeleteModal({{ item.pk }})" class="btn btn-outline">Cancel</button>
+              <form method="POST" action="{% url 'dashboard_schedule_delete' item.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background:#dc2626;">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="fa-solid fa-list-check"></i><p>No schedule items yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

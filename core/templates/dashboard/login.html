@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin Login — Digital Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{--primary:#0F4C81;--primary-dark:#0a3460;--secondary:#00B4D8;--accent:#FF7A00;--border:#e2e8f0;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:'Inter',sans-serif;
+      min-height:100vh;
+      background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 60%,#1a6ab1 100%);
+      display:flex;align-items:center;justify-content:center;padding:2rem;
+    }
+    .login-card{
+      background:#fff;border-radius:16px;
+      padding:2.5rem;width:100%;max-width:400px;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
+    .login-brand{text-align:center;margin-bottom:2rem;}
+    .login-brand .dot{
+      width:48px;height:48px;border-radius:14px;
+      background:var(--primary);display:flex;align-items:center;justify-content:center;
+      margin:0 auto .75rem;
+    }
+    .login-brand .dot i{color:#fff;font-size:1.2rem;}
+    .login-brand h1{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--primary);}
+    .login-brand p{font-size:.8rem;color:#6c757d;margin-top:.25rem;}
+
+    .form-group{margin-bottom:1rem;}
+    label{display:block;font-size:.78rem;font-weight:600;color:#212529;margin-bottom:.4rem;}
+    .input-wrap{position:relative;}
+    .input-wrap i{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:#adb5bd;font-size:.85rem;}
+    input{
+      width:100%;padding:.7rem .85rem .7rem 2.5rem;
+      border:1.5px solid var(--border);border-radius:8px;
+      font-size:.875rem;color:#212529;outline:none;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    input:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(0,180,216,.12);}
+    .btn-login{
+      width:100%;padding:.8rem;margin-top:.5rem;
+      background:var(--accent);color:#fff;border:none;border-radius:8px;
+      font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;
+      cursor:pointer;transition:background .2s;
+      display:flex;align-items:center;justify-content:center;gap:.5rem;
+    }
+    .btn-login:hover{background:#e06a00;}
+    .alert-error{
+      background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;
+      border-radius:8px;padding:.7rem 1rem;font-size:.82rem;
+      margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;
+    }
+    .back-link{text-align:center;margin-top:1.25rem;font-size:.8rem;color:#6c757d;}
+    .back-link a{color:var(--secondary);font-weight:600;}
+  </style>
+</head>
+<body>
+<div class="login-card">
+  <div class="login-brand">
+    <div class="dot"><i class="fa-solid fa-gauge-high"></i></div>
+    <h1>Admin Dashboard</h1>
+    <p>Digital Hub Management Platform</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert-error"><i class="fa-solid fa-circle-xmark"></i> {{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="username">Username</label>
+      <div class="input-wrap">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" name="username" id="username" placeholder="Enter username" required autofocus/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" name="password" id="password" placeholder="Enter password" required/>
+      </div>
+    </div>
+    <button type="submit" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+  </form>
+
+  <div class="back-link"><a href="/">← Back to site</a></div>
+</div>
+</body>
+</html>

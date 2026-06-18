@@ -1,0 +1,108 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Welcome back, {{ request.user.username }}</h1>
+    <p>Here's what's happening with Digital Hub.</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+    <div><div class="stat-num">{{ total_reg }}</div><div class="stat-label">Total Registrations</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon cyan"><i class="fa-solid fa-calendar-days"></i></div>
+    <div><div class="stat-num">{{ total_events }}</div><div class="stat-label">Events</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="fa-solid fa-bullhorn"></i></div>
+    <div><div class="stat-num">{{ total_ann }}</div><div class="stat-label">Published Announcements</div></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  <!-- Registrations by event -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-chart-bar" style="color:var(--secondary);margin-right:.4rem;"></i> Registrations by Event</h2>
+      <a href="{% url 'dashboard_registrations' %}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    {% if reg_by_event %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>Registrations</th></tr></thead>
+        <tbody>
+          {% for row in reg_by_event %}
+          <tr>
+            <td>{{ row.event__title }}</td>
+            <td><span class="badge badge-blue">{{ row.count }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No registrations yet.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Upcoming events -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-calendar" style="color:var(--secondary);margin-right:.4rem;"></i> Upcoming Events</h2>
+      <a href="{% url 'dashboard_events' %}" class="btn btn-outline btn-sm">Manage</a>
+    </div>
+    {% if upcoming %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for ev in upcoming %}
+          <tr>
+            <td>{{ ev.title }}</td>
+            <td><span class="badge badge-cyan">{{ ev.date|date:"M j, Y" }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fa-regular fa-calendar-xmark"></i><p>No upcoming events.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Recent registrations -->
+  <div class="card" style="grid-column:1/-1;">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--secondary);margin-right:.4rem;"></i> Recent Registrations</h2>
+    </div>
+    {% if recent_reg %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Event</th><th>Registered</th></tr></thead>
+        <tbody>
+          {% for r in recent_reg %}
+          <tr>
+            <td>{{ r.full_name }}</td>
+            <td style="color:var(--muted);">{{ r.email }}</td>
+            <td><span class="badge badge-blue">{{ r.event.title }}</span></td>
+            <td style="color:var(--muted);font-size:.8rem;">{{ r.registered_at|date:"M j, Y g:i A" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No registrations yet.</p></div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

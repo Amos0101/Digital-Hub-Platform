@@ -1,0 +1,95 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Registrations{% endblock %}
+{% block topbar_title %}Registrations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Registrations</h1><p>All event sign-ups in one place.</p></div>
+</div>
+
+<!-- Filter -->
+<div class="card" style="margin-bottom:1rem;padding:1rem 1.5rem;">
+  <form method="GET" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <label style="margin-bottom:0;font-size:.82rem;">Filter by event:</label>
+    <select name="event" onchange="this.form.submit()" style="width:auto;min-width:220px;">
+      <option value="">All Events</option>
+      {% for ev in events %}
+      <option value="{{ ev.pk }}" {% if selected_event == ev.pk %}selected{% endif %}>{{ ev.title }}</option>
+      {% endfor %}
+    </select>
+    {% if selected_event %}
+    <a href="{% url 'dashboard_registrations' %}" class="btn btn-outline btn-sm">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card">
+  {% if registrations %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Phone</th>
+          <th>Organization</th><th>Event</th><th>Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registrations %}
+        <tr>
+          <td><strong>{{ r.full_name }}</strong></td>
+          <td style="color:var(--muted);">{{ r.email }}</td>
+          <td style="color:var(--muted);">{{ r.phone|default:"—" }}</td>
+          <td style="color:var(--muted);">{{ r.organization|default:"—" }}</td>
+          <td><span class="badge badge-blue">{{ r.event.title }}</span></td>
+          <td style="color:var(--muted);font-size:.8rem;">{{ r.registered_at|date:"M j, Y g:i A" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-inbox"></i>
+    <p>No registrations found{% if selected_event %} for this event{% endif %}.</p>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card" style="margin-top:1.5rem;">
+  <div class="card-header">
+    <h2><i class="fa-solid fa-people-group" style="color:var(--secondary);margin-right:.4rem;"></i> Hackathon Teams</h2>
+  </div>
+  {% if teams %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Team</th><th>Leader</th><th>Email</th><th>Members</th><th>Event</th><th>Registered</th></tr>
+      </thead>
+      <tbody>
+        {% for t in teams %}
+        <tr>
+          <td><strong>{{ t.team_name }}</strong></td>
+          <td>{{ t.team_leader_name }}</td>
+          <td style="color:var(--muted);">{{ t.team_leader_email }}</td>
+          <td>
+            {% if t.members.all %}
+              {% for m in t.members.all %}
+              <span class="badge badge-gray" style="margin:1px;">{{ m.name }}</span>
+              {% endfor %}
+            {% else %}
+              <span style="color:var(--muted);">—</span>
+            {% endif %}
+          </td>
+          <td><span class="badge badge-orange">{{ t.event.title }}</span></td>
+          <td style="color:var(--muted);font-size:.8rem;">{{ t.registered_at|date:"M j, Y g:i A" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="fa-solid fa-people-group"></i><p>No hackathon teams registered yet.</p></div>
+  {% endif %}
+</div>
+
+{% endblock %}

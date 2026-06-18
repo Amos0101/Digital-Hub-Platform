@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>{% block title %}Dashboard{% endblock %} — Digital Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{
+      --primary:#0F4C81; --primary-dark:#0a3460; --secondary:#00B4D8;
+      --accent:#FF7A00;  --bg:#F0F4F8; --card:#fff;
+      --text:#212529;    --muted:#6c757d; --border:#e2e8f0;
+      --sidebar-w:240px; --radius:10px; --radius-sm:6px;
+      --shadow:0 2px 12px rgba(15,76,129,.08);
+      --font-d:'Space Grotesk',sans-serif; --font-b:'Inter',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font-b);background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+    a{color:inherit;text-decoration:none;}
+
+    /* SIDEBAR */
+    .sidebar{
+      width:var(--sidebar-w);flex-shrink:0;
+      background:var(--primary-dark);
+      display:flex;flex-direction:column;
+      position:fixed;top:0;left:0;bottom:0;z-index:200;
+      transition:transform .3s;
+    }
+    .sidebar-brand{
+      padding:1.5rem 1.25rem 1rem;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;gap:.6rem;
+    }
+    .sidebar-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+    .sidebar-brand span{font-family:var(--font-d);font-weight:700;font-size:1rem;color:#fff;}
+    .sidebar-brand small{display:block;font-size:.68rem;color:rgba(255,255,255,.4);font-weight:400;margin-top:.1rem;}
+
+    .sidebar-nav{flex:1;padding:1rem 0;overflow-y:auto;}
+    .nav-section-label{
+      font-size:.62rem;font-weight:700;letter-spacing:1.5px;
+      text-transform:uppercase;color:rgba(255,255,255,.3);
+      padding:.75rem 1.25rem .35rem;
+    }
+    .sidebar-nav a{
+      display:flex;align-items:center;gap:.75rem;
+      padding:.65rem 1.25rem;
+      font-size:.875rem;color:rgba(255,255,255,.7);
+      transition:background .2s,color .2s;
+      border-radius:0;
+    }
+    .sidebar-nav a:hover,.sidebar-nav a.active{
+      background:rgba(255,255,255,.08);color:#fff;
+    }
+    .sidebar-nav a.active{border-right:3px solid var(--secondary);}
+    .sidebar-nav a i{width:16px;text-align:center;font-size:.85rem;color:rgba(255,255,255,.45);}
+    .sidebar-nav a:hover i,.sidebar-nav a.active i{color:var(--secondary);}
+
+    .sidebar-footer{
+      padding:1rem 1.25rem;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-footer a{
+      display:flex;align-items:center;gap:.6rem;
+      font-size:.8rem;color:rgba(255,255,255,.5);
+      transition:color .2s;
+    }
+    .sidebar-footer a:hover{color:#fff;}
+
+    /* TOPBAR */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{
+      background:var(--card);
+      border-bottom:1px solid var(--border);
+      padding:0 2rem;height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:100;
+    }
+    .topbar-title{font-family:var(--font-d);font-weight:600;font-size:1rem;color:var(--primary);}
+    .topbar-right{display:flex;align-items:center;gap:1rem;}
+    .topbar-user{
+      display:flex;align-items:center;gap:.6rem;
+      font-size:.82rem;color:var(--muted);
+    }
+    .topbar-user .avatar{
+      width:32px;height:32px;border-radius:50%;
+      background:var(--primary);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.75rem;font-weight:700;
+    }
+    .btn-view-site{
+      font-size:.78rem;color:var(--secondary);font-weight:600;
+      display:flex;align-items:center;gap:.35rem;
+      transition:color .2s;
+    }
+    .btn-view-site:hover{color:var(--primary);}
+
+    /* PAGE CONTENT */
+    .content{padding:2rem;flex:1;}
+
+    /* CARDS */
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;}
+    .card-header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:1.25rem;padding-bottom:1rem;
+      border-bottom:1px solid var(--border);
+    }
+    .card-header h2{font-family:var(--font-d);font-size:1rem;font-weight:600;color:var(--primary);}
+
+    /* STAT CARDS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;}
+    .stat-card{
+      background:var(--card);border-radius:var(--radius);
+      padding:1.25rem 1.5rem;
+      box-shadow:var(--shadow);
+      display:flex;align-items:center;gap:1rem;
+    }
+    .stat-icon{
+      width:44px;height:44px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.1rem;flex-shrink:0;
+    }
+    .stat-icon.blue  {background:rgba(15,76,129,.1); color:var(--primary);}
+    .stat-icon.cyan  {background:rgba(0,180,216,.1);  color:var(--secondary);}
+    .stat-icon.orange{background:rgba(255,122,0,.1);  color:var(--accent);}
+    .stat-icon.green {background:rgba(34,197,94,.1);  color:#22c55e;}
+    .stat-num{font-family:var(--font-d);font-size:1.75rem;font-weight:700;color:var(--text);line-height:1;}
+    .stat-label{font-size:.75rem;color:var(--muted);margin-top:.2rem;}
+
+    /* TABLES */
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;}
+    th{
+      text-align:left;padding:.65rem 1rem;
+      font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+      color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);
+    }
+    td{padding:.7rem 1rem;border-bottom:1px solid var(--border);color:var(--text);}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#f8fafc;}
+
+    /* BADGES */
+    .badge{
+      display:inline-flex;align-items:center;gap:.3rem;
+      padding:.25rem .65rem;border-radius:999px;
+      font-size:.7rem;font-weight:700;letter-spacing:.3px;
+    }
+    .badge-blue   {background:rgba(15,76,129,.1);  color:var(--primary);}
+    .badge-cyan   {background:rgba(0,180,216,.1);  color:#0096b7;}
+    .badge-orange {background:rgba(255,122,0,.1);  color:var(--accent);}
+    .badge-green  {background:rgba(34,197,94,.1);  color:#15803d;}
+    .badge-red    {background:rgba(239,68,68,.1);  color:#dc2626;}
+    .badge-gray   {background:rgba(108,117,125,.1);color:var(--muted);}
+
+    /* BUTTONS */
+    .btn{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.5rem 1.1rem;border-radius:var(--radius-sm);
+      font-family:var(--font-d);font-size:.82rem;font-weight:600;
+      cursor:pointer;border:none;transition:all .2s;
+    }
+    .btn-primary{background:var(--accent);color:#fff;}
+    .btn-primary:hover{background:#e06a00;transform:translateY(-1px);}
+    .btn-secondary{background:var(--primary);color:#fff;}
+    .btn-secondary:hover{background:var(--primary-dark);}
+    .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary);}
+    .btn-outline:hover{background:var(--primary);color:#fff;}
+    .btn-danger{background:transparent;color:#dc2626;border:1.5px solid #fca5a5;}
+    .btn-danger:hover{background:#dc2626;color:#fff;border-color:#dc2626;}
+    .btn-sm{padding:.35rem .75rem;font-size:.75rem;}
+    .btn-icon{padding:.4rem .5rem;}
+
+    /* FORMS */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .form-group{margin-bottom:1rem;}
+    .form-group.full{grid-column:1/-1;}
+    label{display:block;font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:.35rem;}
+    input[type=text],input[type=email],input[type=date],
+    input[type=time],input[type=datetime-local],
+    select,textarea{
+      width:100%;padding:.6rem .85rem;
+      border:1.5px solid var(--border);border-radius:var(--radius-sm);
+      font-family:var(--font-b);font-size:.875rem;color:var(--text);
+      background:#fff;transition:border-color .2s,box-shadow .2s;outline:none;
+    }
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--secondary);
+      box-shadow:0 0 0 3px rgba(0,180,216,.12);
+    }
+    textarea{resize:vertical;}
+    .form-check{display:flex;align-items:center;gap:.5rem;font-size:.875rem;}
+    .form-check input{width:auto;}
+    .errorlist{list-style:none;margin-top:.3rem;}
+    .errorlist li{font-size:.75rem;color:#dc2626;}
+
+    /* ALERTS */
+    .alert{
+      padding:.75rem 1rem;border-radius:var(--radius-sm);
+      font-size:.85rem;margin-bottom:1rem;
+      display:flex;align-items:center;gap:.6rem;
+    }
+    .alert-success{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+    .alert-error  {background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+
+    /* PAGE HEADER */
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .page-header h1{font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--primary);}
+    .page-header p{font-size:.82rem;color:var(--muted);margin-top:.2rem;}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:3rem 1rem;color:var(--muted);}
+    .empty-state i{font-size:2.5rem;color:var(--border);display:block;margin-bottom:.75rem;}
+    .empty-state p{font-size:.875rem;}
+
+    /* MODAL */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,.5);z-index:1000;
+      align-items:center;justify-content:center;
+    }
+    .modal-overlay.open{display:flex;}
+    .modal{
+      background:var(--card);border-radius:var(--radius);
+      padding:2rem;max-width:400px;width:90%;
+    }
+    .modal h3{font-family:var(--font-d);font-size:1.1rem;color:var(--text);margin-bottom:.5rem;}
+    .modal p{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;}
+    .modal-actions{display:flex;gap:.75rem;justify-content:flex-end;}
+
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%);}
+      .sidebar.open{transform:translateX(0);}
+      .main{margin-left:0;}
+      .form-grid{grid-template-columns:1fr;}
+      .stats-grid{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="dot"></div>
+    <div>
+      <span>Digital Hub</span>
+      <small>Management Platform</small>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="{% url 'dashboard_home' %}" class="{% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
+    </a>
+
+    <div class="nav-section-label">Manage</div>
+    <a href="{% url 'dashboard_events' %}" class="{% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-calendar-days"></i> Events
+    </a>
+    <a href="{% url 'dashboard_announcements' %}" class="{% if 'announcement' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-bullhorn"></i> Announcements
+    </a>
+
+    <a href="{% url 'dashboard_speakers' %}" class="{% if 'speaker' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-microphone-lines"></i> Speakers
+    </a>
+    <a href="{% url 'dashboard_sponsors' %}" class="{% if 'sponsor' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-handshake"></i> Sponsors
+    </a>
+    <a href="{% url 'dashboard_schedule' %}" class="{% if 'schedule' in request.resolver_match.url_name %}active{% endif %}">
+  <i class="fa-solid fa-list-check"></i> Program Schedule
+</a>
+
+    <a href="{% url 'dashboard_registrations' %}" class="{% if request.resolver_match.url_name == 'dashboard_registrations' %}active{% endif %}">
+      <i class="fa-solid fa-users"></i> Registrations
+    </a>
+
+    <div class="nav-section-label">Site</div>
+    <a href="/admin/core/sitesettings/"><i class="fa-solid fa-gear"></i> Site Settings</a>
+    <a href="/admin/" target="_blank"><i class="fa-solid fa-lock"></i> Django Admin</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{% url 'dashboard_logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <span class="topbar-title">{% block topbar_title %}Dashboard{% endblock %}</span>
+    <div class="topbar-right">
+      <a href="/" class="btn-view-site" target="_blank">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Site
+      </a>
+      <div class="topbar-user">
+        <div class="avatar">{{ request.user.username|first|upper }}</div>
+        {{ request.user.username }}
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+        <i class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script>
+  function openDeleteModal(id){ document.getElementById('modal-'+id).classList.add('open'); }
+  function closeDeleteModal(id){ document.getElementById('modal-'+id).classList.remove('open'); }
+</script>
+</body>
+</html>

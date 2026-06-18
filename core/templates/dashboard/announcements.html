@@ -1,0 +1,65 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Announcements{% endblock %}
+{% block topbar_title %}Announcements{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Announcements</h1><p>Publish news and updates to the public site.</p></div>
+  <a href="{% url 'dashboard_announcement_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Announcement</a>
+</div>
+
+<div class="card">
+  {% if announcements %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Category</th><th>Event</th><th>Status</th><th>Publish Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for ann in announcements %}
+        <tr>
+          <td><strong>{{ ann.title }}</strong></td>
+          <td><span class="badge badge-cyan">{{ ann.get_category_display }}</span></td>
+          <td style="color:var(--muted);">{{ ann.event.title|default:"—" }}</td>
+          <td>
+            {% if ann.is_published %}
+            <span class="badge badge-green">Published</span>
+            {% else %}
+            <span class="badge badge-gray">Draft</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--muted);font-size:.8rem;">{{ ann.publish_date|date:"M j, Y g:i A"|default:"—" }}</td>
+          <td>
+            <div style="display:flex;gap:.5rem;">
+              <a href="{% url 'dashboard_announcement_edit' ann.pk %}" class="btn btn-outline btn-sm btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <button onclick="openDeleteModal({{ ann.pk }})" class="btn btn-danger btn-sm btn-icon" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+
+        <div class="modal-overlay" id="modal-{{ ann.pk }}">
+          <div class="modal">
+            <h3>Delete "{{ ann.title }}"?</h3>
+            <p>This announcement will be permanently removed from the site.</p>
+            <div class="modal-actions">
+              <button onclick="closeDeleteModal({{ ann.pk }})" class="btn btn-outline">Cancel</button>
+              <form method="POST" action="{% url 'dashboard_announcement_delete' ann.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background:#dc2626;">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-bullhorn"></i>
+    <p>No announcements yet. <a href="{% url 'dashboard_announcement_create' %}" style="color:var(--secondary);">Create one →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

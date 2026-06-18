@@ -1,0 +1,58 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Sponsors{% endblock %}
+{% block topbar_title %}Sponsors & Partners{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Sponsors & Partners</h1><p>Manage sponsors per event.</p></div>
+  <a href="{% url 'dashboard_sponsor_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Sponsor</a>
+</div>
+
+<div class="card">
+  {% if sponsors %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Logo</th><th>Name</th><th>Tier</th><th>Event</th><th>Website</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in sponsors %}
+        <tr>
+          <td>
+            {% if s.logo %}
+            <img src="{{ s.logo.url }}" style="height:32px;max-width:80px;object-fit:contain;" alt="{{ s.name }}"/>
+            {% else %}
+            <span style="color:var(--muted);">—</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ s.name }}</strong></td>
+          <td><span class="badge badge-orange">{{ s.get_tier_display }}</span></td>
+          <td><span class="badge badge-blue">{{ s.event.title }}</span></td>
+          <td>{% if s.website_url %}<a href="{{ s.website_url }}" target="_blank" style="color:var(--secondary);font-size:.8rem;">Visit ↗</a>{% else %}—{% endif %}</td>
+          <td>
+            <div style="display:flex;gap:.5rem;">
+              <a href="{% url 'dashboard_sponsor_edit' s.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fa-solid fa-pen"></i></a>
+              <button onclick="openDeleteModal({{ s.pk }})" class="btn btn-danger btn-sm btn-icon"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+        <div class="modal-overlay" id="modal-{{ s.pk }}">
+          <div class="modal">
+            <h3>Remove "{{ s.name }}"?</h3>
+            <p>This sponsor will be removed from the site.</p>
+            <div class="modal-actions">
+              <button onclick="closeDeleteModal({{ s.pk }})" class="btn btn-outline">Cancel</button>
+              <form method="POST" action="{% url 'dashboard_sponsor_delete' s.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background:#dc2626;">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="fa-solid fa-handshake"></i><p>No sponsors added yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Events{% endblock %}
+{% block topbar_title %}Events{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Events</h1><p>Create and manage all hub events.</p></div>
+  <a href="{% url 'dashboard_event_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Event</a>
+</div>
+
+<div class="card">
+  {% if events %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Type</th><th>Date</th><th>Venue</th><th>Poster</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for ev in events %}
+        <tr>
+          <td><strong>{{ ev.title }}</strong></td>
+          <td><span class="badge badge-blue">{{ ev.get_event_type_display }}</span></td>
+          <td>{{ ev.date|date:"M j, Y" }}</td>
+          <td style="color:var(--muted);">{{ ev.venue }}</td>
+          <td>
+            {% if ev.poster %}
+            <span class="badge badge-green"><i class="fa-solid fa-check"></i> Uploaded</span>
+            {% else %}
+            <span class="badge badge-gray">None</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ev.is_active %}
+            <span class="badge badge-green">Active</span>
+            {% else %}
+            <span class="badge badge-gray">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:.5rem;">
+              <a href="{% url 'dashboard_event_edit' ev.pk %}" class="btn btn-outline btn-sm btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <button onclick="openDeleteModal({{ ev.pk }})" class="btn btn-danger btn-sm btn-icon" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Delete modal -->
+        <div class="modal-overlay" id="modal-{{ ev.pk }}">
+          <div class="modal">
+            <h3>Delete "{{ ev.title }}"?</h3>
+            <p>This will permanently delete the event and all its registrations. This cannot be undone.</p>
+            <div class="modal-actions">
+              <button onclick="closeDeleteModal({{ ev.pk }})" class="btn btn-outline">Cancel</button>
+              <form method="POST" action="{% url 'dashboard_event_delete' ev.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background:#dc2626;border-color:#dc2626;">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-calendar-xmark"></i>
+    <p>No events yet. <a href="{% url 'dashboard_event_create' %}" style="color:var(--secondary);">Create your first event →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

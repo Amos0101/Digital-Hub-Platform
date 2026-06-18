@@ -1,0 +1,58 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Speakers{% endblock %}
+{% block topbar_title %}Speakers & Mentors{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Speakers & Mentors</h1><p>Manage speakers per event.</p></div>
+  <a href="{% url 'dashboard_speaker_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Speaker</a>
+</div>
+
+<div class="card">
+  {% if speakers %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Photo</th><th>Name</th><th>Position</th><th>Event</th><th>Order</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in speakers %}
+        <tr>
+          <td>
+            {% if s.photo %}
+            <img src="{{ s.photo.url }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="{{ s.name }}"/>
+            {% else %}
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--muted);"><i class="fa-solid fa-user"></i></div>
+            {% endif %}
+          </td>
+          <td><strong>{{ s.name }}</strong></td>
+          <td style="color:var(--muted);">{{ s.position|default:"—" }}</td>
+          <td><span class="badge badge-blue">{{ s.event.title }}</span></td>
+          <td>{{ s.order }}</td>
+          <td>
+            <div style="display:flex;gap:.5rem;">
+              <a href="{% url 'dashboard_speaker_edit' s.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fa-solid fa-pen"></i></a>
+              <button onclick="openDeleteModal({{ s.pk }})" class="btn btn-danger btn-sm btn-icon"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+        <div class="modal-overlay" id="modal-{{ s.pk }}">
+          <div class="modal">
+            <h3>Remove "{{ s.name }}"?</h3>
+            <p>This speaker will be removed from the site.</p>
+            <div class="modal-actions">
+              <button onclick="closeDeleteModal({{ s.pk }})" class="btn btn-outline">Cancel</button>
+              <form method="POST" action="{% url 'dashboard_speaker_delete' s.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background:#dc2626;">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="fa-solid fa-microphone-lines"></i><p>No speakers added yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

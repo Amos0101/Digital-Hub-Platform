@@ -1,0 +1,147 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Bulk Add Schedule{% endblock %}
+{% block topbar_title %}Bulk Add Schedule{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Bulk Add Program Schedule</h1><p>Select an event, then add every activity in one go.</p></div>
+  <a href="{% url 'dashboard_schedule' %}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Step 1: choose event -->
+<div class="card" style="max-width:700px;margin-bottom:1.5rem;">
+  <form method="GET">
+    <div class="form-group full">
+      <label>Event</label>
+      {{ select_form.event }}
+    </div>
+  </form>
+</div>
+
+{% if event %}
+<div class="card" style="max-width:900px;">
+
+  <!-- Event header with date -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+    <div>
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;color:var(--primary);font-weight:700;">
+        <i class="fa-solid fa-calendar-day" style="color:var(--secondary);margin-right:.5rem;"></i>{{ event.title }}
+      </h2>
+      <p style="font-size:.82rem;color:var(--muted);margin-top:.25rem;">{{ event.date|date:"l, F j, Y" }} &middot; {{ event.venue }}</p>
+    </div>
+    <span class="badge badge-blue">{{ event.get_event_type_display }}</span>
+  </div>
+
+  {% if existing_items %}
+  <div style="background:var(--bg);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+    <p style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem;">
+      Already scheduled ({{ existing_items.count }})
+    </p>
+    {% for item in existing_items %}
+    <div style="display:flex;gap:.75rem;font-size:.82rem;padding:.35rem 0;">
+      <strong style="color:var(--accent);min-width:70px;">{{ item.time|time:"g:i A" }}</strong>
+      <span>{{ item.activity }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="POST" id="bulkScheduleForm">
+    {% csrf_token %}
+    <input type="hidden" name="event_id" value="{{ event.pk }}"/>
+
+    <label style="margin-bottom:.75rem;display:block;">New Activities</label>
+    <div id="rowsContainer"></div>
+
+    <button type="button" class="btn-add-row" onclick="addScheduleRow()">
+      <i class="fa-solid fa-plus"></i> Add Row
+    </button>
+
+    <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save All</button>
+      <a href="{% url 'dashboard_schedule' %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="card" style="max-width:700px;">
+  <div class="empty-state">
+    <i class="fa-solid fa-calendar-day"></i>
+    <p>Select an event above to start adding its schedule.</p>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr auto;
+    gap: .6rem;
+    margin-bottom: .6rem;
+    align-items: start;
+  }
+  .schedule-row input {
+    padding: .6rem .8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: .85rem;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    width: 100%;
+  }
+  .schedule-row input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(0,180,216,.12); }
+  .btn-remove-row {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: #fee2e2; color: #dc2626; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background .2s;
+  }
+  .btn-remove-row:hover { background: #fca5a5; }
+  .btn-add-row {
+    display: flex; align-items: center; gap: .5rem;
+    background: transparent; border: 1.5px dashed var(--secondary);
+    color: var(--secondary); padding: .65rem 1rem; border-radius: 8px;
+    font-size: .85rem; font-weight: 600; cursor: pointer;
+    width: 100%; justify-content: center; transition: background .2s;
+  }
+  .btn-add-row:hover { background: rgba(0,180,216,.08); }
+  @media (max-width: 700px) {
+    .schedule-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  let rowCount = 0;
+
+  function addScheduleRow() {
+    rowCount++;
+    const container = document.getElementById('rowsContainer');
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    row.id = 'schedule-row-' + rowCount;
+    row.innerHTML = `
+      <input type="time" name="item_time" required />
+      <input type="text" name="item_activity" placeholder="Activity, e.g. Opening Ceremony" required />
+      <input type="text" name="item_description" placeholder="Description (optional)" />
+      <button type="button" class="btn-remove-row" onclick="removeScheduleRow(${rowCount})">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    `;
+    container.appendChild(row);
+  }
+
+  function removeScheduleRow(id) {
+    const row = document.getElementById('schedule-row-' + id);
+    if (row) row.remove();
+  }
+
+  {% if event %}
+  document.addEventListener('DOMContentLoaded', () => {
+    addScheduleRow();
+    addScheduleRow();
+    addScheduleRow();
+  });
+  {% endif %}
+</script>
+{% endblock %}
